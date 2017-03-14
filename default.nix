@@ -5,6 +5,11 @@ let
     then pythonPackages
     else getAttr pythonPackages pkgs;
 
+  # Works with the new python-packages, still can fallback to the old
+  # variant.
+  basePythonPackagesUnfix = basePythonPackages.__unfix__ or (
+    self: basePythonPackages.override (a: { inherit self; }));
+
   elem = builtins.elem;
   basename = path: with pkgs.lib; last (splitString "/" path);
   startsWith = prefix: full: let
@@ -21,13 +26,8 @@ let
 
   sample-src = builtins.filterSource src-filter ./.;
 
-  pythonPackagesGenerated = self: basePythonPackages.override (a: {
-    inherit self;
-  })
-  // (scopedImport {
-    self = self;
-    super = basePythonPackages;
-    inherit pkgs;
+  pythonPackagesGenerated = self: super: (scopedImport {
+    inherit pkgs self super;
     inherit (pkgs) fetchurl fetchgit;
   } ./pkgs/python-packages.nix);
 
@@ -47,6 +47,7 @@ let
     (fix
     (extends pythonPackagesLocalOverrides
     (extends pythonPackagesOverrides
-             pythonPackagesGenerated)));
+    (extends pythonPackagesGenerated
+             basePythonPackagesUnfix))));
 
 in myPythonPackages.sample
