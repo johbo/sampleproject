@@ -7,5 +7,8 @@ in pythonPackages.buildPythonPackage {
   name = "sample-1.2.0";
   src = ./.;
 
-  propagatedBuildInputs = [ pythonPackages.peppercorn ];
+  propagatedBuildInputs = [
+    pythonPackages.lxml
+    pythonPackages.peppercorn
+  ];
 }
