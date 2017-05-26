@@ -1,6 +1,11 @@
 { pkgs ? (import <nixpkgs> {}) }:
 
-pkgs.python36Packages.buildPythonPackage {
+let
+  pythonPackages = pkgs.python36Packages;
+
+in pythonPackages.buildPythonPackage {
   name = "sample-1.2.0";
   src = ./.;
+
+  propagatedBuildInputs = [ pythonPackages.peppercorn ];
 }
